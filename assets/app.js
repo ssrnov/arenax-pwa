@@ -48,6 +48,26 @@ async function api(path, options = {}) {
   return data;
 }
 
+function populateJoinTeamOptions() {
+  const select = $('join-team-select');
+  if (!select) return;
+  const options = ['<option value="">Solo player</option>'];
+  teams.forEach(team => {
+    const isCaptain = Number(team.owner_id) === Number(currentUser?.id);
+    if (isCaptain || Array.isArray(team.roster) && team.roster.some(member => Number(member.user_id) === Number(currentUser?.id) && String(member.status) === 'active')) {
+      options.push(`<option value="${team.id}">${(team.name || 'Unnamed team')}</option>`);
+    }
+  });
+  select.innerHTML = options.join('');
+  if (!teams.length) {
+    select.disabled = true;
+    select.title = 'Create or join a team first';
+    return;
+  }
+  select.disabled = false;
+  select.title = '';
+}
+
 function renderTournamentList() {
   const list = $('tournament-list');
   if (!list) return;
@@ -111,6 +131,8 @@ function renderTournamentList() {
       }
       $('join-tournament-id').value = String(tournamentId);
       $('join-tournament-name').textContent = selectedTournament.title || 'this event';
+      populateJoinTeamOptions();
+      $('join-team-select').value = '';
       $('join-team-name').value = '';
       $('join-error').textContent = '';
       $('join-dialog').showModal();
@@ -152,6 +174,7 @@ async function refreshMe() {
     tickets = [];
     teams = [];
     teamInvites = [];
+    populateJoinTeamOptions();
     renderWalletHistory();
     renderTopupStatus();
     renderNotifications();
@@ -427,6 +450,7 @@ async function refreshTeams() {
     teamInvites = Array.isArray(d.invites) ? d.invites : [];
     teamRoster = d.roster && typeof d.roster === 'object' ? d.roster : {};
     teams = teams.map(team => ({ ...team, roster: Array.isArray(team.roster) ? team.roster : (teamRoster[team.id] || []) }));
+    populateJoinTeamOptions();
     renderTeams();
     renderTeamInvites();
   } catch (e) {
@@ -563,8 +587,10 @@ $('join-form').addEventListener('submit', async e => {
     return;
   }
 
+  const selectedTeamId = $('join-team-select').value;
   const params = new URLSearchParams({
     tournament_id: String(tournamentId),
+    team_id: selectedTeamId || '',
     team_name: $('join-team-name').value.trim(),
   });
 

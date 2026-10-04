@@ -118,6 +118,7 @@ $csrf=htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
     <p class="mt-1 text-xs text-slate-400">Registering for <span id="join-tournament-name" class="font-semibold text-violet-300">this event</span></p>
     <form id="join-form" class="mt-4 space-y-3">
       <input id="join-tournament-id" type="hidden" value="0">
+      <label class="block text-xs text-slate-400">Register as<select id="join-team-select" class="mt-1 w-full rounded-xl border border-white/10 bg-[#0b1020] p-3 text-sm"><option value="">Solo player</option></select></label>
       <label class="block text-xs text-slate-400">Team name (optional)<input id="join-team-name" class="mt-1 w-full rounded-xl border border-white/10 bg-[#0b1020] p-3 text-sm" maxlength="100" placeholder="Enter your squad name"></label>
       <p id="join-error" class="text-xs text-rose-300"></p>
       <button class="w-full rounded-xl purple py-3 text-sm font-bold">Confirm registration</button>
