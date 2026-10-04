@@ -1,0 +1,16 @@
+Options -Indexes
+<IfModule mod_headers.c>
+ Header set X-Content-Type-Options "nosniff"
+ Header set Referrer-Policy "strict-origin-when-cross-origin"
+ Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+<FilesMatch "^(config\.php|config\.example\.php|schema\.sql|README\.md)$">
+ Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+ RewriteEngine On
+ RewriteRule ^private_uploads/ - [F,L]
+</IfModule>
+<Files "setup-admin.php">
+ Require all denied
+</Files>

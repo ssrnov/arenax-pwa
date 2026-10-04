@@ -1,0 +1,20 @@
+# Local environment / secrets
+config.php
+.env
+.env.*
+
+# Generated runtime data
+private_uploads/
+uploads/
+tmp/
+*.log
+
+# PHP dependencies / tooling
+vendor/
+composer.phar
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
