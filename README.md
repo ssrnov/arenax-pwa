@@ -1,26 +1,39 @@
 # ArenaX PWA + Tournament Admin
 
-PHP 8.1+ / MySQL 8 or MariaDB / Tailwind CSS / Web App Manifest / Service Worker. Mobile-first installable PWA with account registration/login, player UI, wallet, manual UPI top-up request submission, admin review, tournament creation/status management, tournament listing/join endpoint, coin ledger, player moderation, tickets and audit log.
+PHP 8.1+ / MySQL 8 or MariaDB / Tailwind CSS / Web App Manifest / Service Worker. This is a mobile-first installable PWA with player registration/login, wallet logic, UPI top-up requests, admin review, tournament discovery/join flows, support tickets, and the start of team management.
 
-## Setup
-1. Use PHP 8.1+ with PDO MySQL and Fileinfo. Enable HTTPS.
-2. Create a MySQL database and user in cPanel/phpMyAdmin. Import `schema.sql` (if DB already selected and cannot create DB, remove `CREATE DATABASE` and `USE` lines).
-3. Edit `config.php` credentials and base URL. Never commit credentials.
-4. Upload project contents to the web root or a subfolder. Ensure `private_uploads/` is writable by PHP. Best practice is to move it outside document root and update upload/evidence paths.
-5. Create the first admin from CLI: `php setup-admin.php admin@example.com 'Use-A-Long-Unique-Password' 'ArenaX Admin'`. Delete `setup-admin.php` immediately after use. Do not run this from a public browser.
-6. Visit `/admin/login.php`. Configure real UPI instructions in player UI/config before accepting any money. Coin package prices are server-authoritative in `api/topup-request.php`.
-7. Test with dummy users and zero-value test tournaments before launch.
+## Quick start
+1. Use PHP 8.1+ with PDO MySQL and Fileinfo enabled.
+2. Create a MySQL database and user in cPanel/phpMyAdmin.
+3. Import `schema.sql` and, if required for expansion features, `schema_expansion.sql`.
+4. Copy `config.example.php` to `config.php` and update your credentials and base URL.
+5. Ensure `private_uploads/` is writable by PHP.
+6. Create the first admin:
+   `php setup-admin.php admin@example.com 'Use-A-Long-Unique-Password' 'ArenaX Admin'`
+7. Delete `setup-admin.php` immediately after use.
+8. Open `/admin/login.php` and continue with the admin setup.
+
+## Security notes
+- Never commit `config.php`.
+- Do not trust client-submitted payment screenshots as proof without admin verification.
+- Use HTTPS in production.
+- Keep uploaded evidence outside the public web root when possible.
 
 ## PWA install
-- Android Chrome/Edge: open HTTPS domain; use Install App prompt or menu > Install app/Add to Home screen. Prompt availability varies by browser/install eligibility.
-- iPhone/iPad: Safari > Share > Add to Home Screen. iOS does not expose `beforeinstallprompt`.
-- Desktop Chrome/Edge: install icon in address bar or browser menu when eligible.
+- Android Chrome/Edge: open the HTTPS site and choose Install app / Add to Home Screen.
+- iPhone/iPad: Safari > Share > Add to Home Screen.
+- Desktop Chrome/Edge: use the browser install prompt when available.
 
-## Implemented admin sections
-Dashboard; payment requests with approve/reject; tournament creation and status changes; player status moderation; coin ledger; support ticket list; audit log; settings guidance. Admin roles: super_admin, finance, tournament, support, moderator, analyst. Current page actions enforce role checks for finance, tournament, and moderation tasks. Extend permissions before production.
+## Included core flows
+- Account registration and login
+- Player wallet and top-up request flow
+- Live tournament listing and join flow
+- Support ticket and notifications
+- Team creation, invites, roster visibility, and captain/member actions
+- Basic admin dashboard and moderation tools
 
-## Payment safety
-Screenshots are untrusted evidence and must never be treated as payment proof. Finance admin must verify receipt against bank/UPI merchant records independently. Approval locks the pending request in a DB transaction, inserts a unique ledger entry, updates coins and sends a notification. Duplicate UTRs are rejected. Never credit coins client-side. A static UPI QR/ID is a manual process, not automated reconciliation. Refunds, payouts, GST/tax, state-specific gaming rules, age restrictions, and applicable Indian online-gaming/payment regulations require professional review before launch.
+## Production checklist
+This project is a substantial deployable starter, not a fully audited production service. Before launch, add MFA, rate limiting, password resets, stronger security headers/CSP, malware scanning for uploads, better payment reconciliation, backups, monitoring, privacy/terms/consent reviews, accessibility reviews, and legal/regulatory review.
 
-## Important limitations / production checklist
-This is a substantial deployable starter, not a fully audited commercial service. Before public launch add MFA, rate limiting, email verification/password reset, stronger CSP and security headers, upload malware scanning, private storage outside webroot, image evidence preview tests, support ticket actions, team roster and bracket automation, result evidence/review and prize distribution, push subscription/delivery service, payment reconciliation integration, backups, monitoring, privacy/terms/consent, accessibility review, load/security testing, and legal review. Use compiled Tailwind assets instead of CDN in production. Service worker caches only the app shell; authenticated and financial API responses must remain network-only.
+## License
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
