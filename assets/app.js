@@ -8,6 +8,13 @@ let topupStatus = [];
 let teams = [];
 let teamInvites = [];
 let teamRoster = {};
+let appSettings = {
+  app_name: 'ArenaX',
+  upi_id: '',
+  home_notice: '',
+  registration_enabled: '1',
+  maintenance_mode: '0',
+};
 
 const $ = id => document.getElementById(id);
 const toast = msg => {
@@ -46,6 +53,57 @@ async function api(path, options = {}) {
   if (data.csrf) csrf = data.csrf;
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
+}
+
+function applySettingsUi() {
+  const notice = $('home-notice');
+  if (notice) {
+    if (appSettings.home_notice) {
+      notice.textContent = appSettings.home_notice;
+      notice.classList.remove('hidden');
+    } else {
+      notice.classList.add('hidden');
+    }
+  }
+
+  const upi = $('official-upi-id');
+  if (upi) {
+    upi.textContent = appSettings.upi_id || 'UPI not configured';
+  }
+
+  const appName = appSettings.app_name || 'ArenaX';
+  document.title = `${appName} — Play. Compete. Win.`;
+
+  const authOpen = $('auth-open');
+  if (authOpen) {
+    if (String(appSettings.maintenance_mode) === '1') {
+      authOpen.disabled = true;
+      authOpen.textContent = 'Maintenance mode';
+    } else if (String(appSettings.registration_enabled) !== '1') {
+      authOpen.disabled = false;
+      authOpen.textContent = 'Sign in';
+    } else {
+      authOpen.disabled = false;
+      authOpen.textContent = 'Sign in / Register';
+    }
+  }
+
+  const startCard = $('get-started-card');
+  if (startCard) {
+    const isSignedIn = Boolean(currentUser);
+    startCard.classList.toggle('hidden', isSignedIn);
+  }
+}
+
+async function refreshSettings() {
+  try {
+    const data = await api('api/settings.php');
+    appSettings = { ...appSettings, ...(data.settings || {}) };
+    applySettingsUi();
+  } catch (err) {
+    console.warn('settings load failed', err);
+    applySettingsUi();
+  }
 }
 
 function populateJoinTeamOptions() {
@@ -141,6 +199,7 @@ function renderTournamentList() {
 }
 
 async function refreshMe() {
+  applySettingsUi();
   try {
     const d = await api('api/me.php');
     currentUser = d.user || null;
@@ -496,9 +555,32 @@ $('install-btn').addEventListener('click', async () => {
 
 window.addEventListener('appinstalled', () => toast('ArenaX installed successfully!'));
 
-$('auth-open').addEventListener('click', () => $('auth-dialog').showModal());
+$('auth-open').addEventListener('click', () => {
+  if (String(appSettings.maintenance_mode) === '1') {
+    toast('Platform is in maintenance mode.');
+    return;
+  }
+  if (String(appSettings.registration_enabled) !== '1') {
+    isRegister = false;
+    $('username-wrap').classList.add('hidden');
+    $('auth-submit').textContent = 'Sign in';
+    $('auth-toggle').textContent = 'New to ArenaX? Create account';
+    $('auth-password').setAttribute('autocomplete', 'current-password');
+  } else {
+    isRegister = true;
+    $('username-wrap').classList.remove('hidden');
+    $('auth-submit').textContent = 'Create account';
+    $('auth-toggle').textContent = 'Already registered? Sign in';
+    $('auth-password').setAttribute('autocomplete', 'new-password');
+  }
+  $('auth-dialog').showModal();
+});
 
 $('auth-toggle').addEventListener('click', () => {
+  if (String(appSettings.registration_enabled) !== '1') {
+    toast('Registration is currently disabled.');
+    return;
+  }
   isRegister = !isRegister;
   $('username-wrap').classList.toggle('hidden', !isRegister);
   $('auth-submit').textContent = isRegister ? 'Create account' : 'Sign in';
@@ -655,6 +737,7 @@ $('ticket-form').addEventListener('submit', async e => {
 });
 
 (async () => {
+  await refreshSettings();
   await refreshMe();
   await refreshTournaments();
 })();

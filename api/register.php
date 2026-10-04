@@ -1,5 +1,11 @@
 ﻿<?php
 require __DIR__.'/../includes/bootstrap.php'; require_post(); verify_csrf();
+if (app_setting($pdo, 'maintenance_mode', '0') === '1') {
+  json_out(['error' => 'Platform is in maintenance mode. Please try again later.'], 503);
+}
+if (app_setting($pdo, 'registration_enabled', '1') !== '1') {
+  json_out(['error' => 'Registration is currently disabled.'], 403);
+}
 $data = json_decode(file_get_contents('php://input'), true);
 if (!is_array($data)) {
   $data = $_POST;

@@ -51,15 +51,9 @@ $csrf=htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
         </div>
       </div>
 
-      <div class="space-y-3">
-        <div class="flex items-center justify-between"><h2 class="font-bold">Featured tournaments</h2><a href="#tournaments" class="text-xs text-violet-300">View all</a></div>
-        <article class="glass rounded-2xl p-4">
-          <div class="flex items-start justify-between"><div><span class="text-xs font-semibold text-emerald-300">REGISTRATION OPEN</span><h3 class="mt-1 font-bold">BGMI Daily Cup</h3><p class="mt-1 text-xs text-slate-400">Squad · TPP · 64 teams</p></div><div class="text-right"><p class="text-xs text-slate-400">Prize pool</p><p class="font-black text-yellow-300">10,000 AC</p></div></div>
-          <div class="mt-4 flex items-center justify-between border-t border-white/10 pt-3"><span class="text-xs text-slate-400">Entry: 50 AC / team</span><a href="#tournaments" class="rounded-lg purple px-4 py-2 text-xs font-bold">View details</a></div>
-        </article>
-      </div>
+      <div id="home-notice" class="hidden rounded-2xl border border-amber-400/20 bg-amber-500/10 p-3 text-sm text-amber-200"></div>
 
-      <div class="glass rounded-2xl p-4">
+      <div id="get-started-card" class="glass rounded-2xl p-4">
         <h2 class="font-bold">Get started</h2>
         <p class="mt-1 text-sm text-slate-400">Sign in or create an account to save your profile and tournament progress.</p>
         <button id="auth-open" class="mt-3 w-full rounded-xl border border-violet-400/40 py-3 text-sm font-bold text-violet-200">Sign in / Register</button>
@@ -102,7 +96,7 @@ $csrf=htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
     <form method="dialog"><button class="float-right text-slate-400" aria-label="Close">✕</button></form>
     <h2 class="text-xl font-bold">Add coins</h2>
     <p class="mt-1 text-xs text-slate-400">Pay to the official UPI ID, then submit your transaction proof.</p>
-    <div class="mt-4 rounded-xl bg-[#0b1020] p-3"><p class="text-xs text-slate-400">UPI ID</p><p class="font-semibold">CONFIGURE_OFFICIAL_UPI</p><p class="mt-1 text-xs text-amber-300">Replace this demo placeholder before launch.</p></div>
+    <div class="mt-4 rounded-xl bg-[#0b1020] p-3"><p class="text-xs text-slate-400">UPI ID</p><p id="official-upi-id" class="font-semibold">Loading…</p><p class="mt-1 text-xs text-amber-300">Use the official account configured by the admin team.</p></div>
     <form id="topup-form" class="mt-4 space-y-3">
       <label class="block text-xs text-slate-400">Coin package<select id="package" class="mt-1 w-full rounded-xl border border-white/10 bg-[#0b1020] p-3 text-sm"><option value="5000|200">₹50 — 200 AC</option><option value="10000|500">₹100 — 500 AC</option><option value="20000|1100">₹200 — 1,100 AC</option></select></label>
       <label class="block text-xs text-slate-400">UPI transaction reference / UTR<input id="utr" required minlength="8" class="mt-1 w-full rounded-xl border border-white/10 bg-[#0b1020] p-3 text-sm" placeholder="Enter UTR"></label>

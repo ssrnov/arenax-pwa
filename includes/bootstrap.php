@@ -21,6 +21,39 @@ function verify_csrf(): void {
   $provided = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf'] ?? '');
   if (!is_string($provided) || !hash_equals($_SESSION['csrf'] ?? '', $provided)) json_out(['error'=>'Invalid security token. Refresh and retry.'],419);
 }
+function app_setting(PDO $pdo, string $key, string $default = ''): string {
+  try {
+    $q = $pdo->prepare('SELECT setting_value FROM app_settings WHERE setting_key = ? LIMIT 1');
+    $q->execute([$key]);
+    $value = $q->fetchColumn();
+    return $value !== false && $value !== null ? (string)$value : $default;
+  } catch (Throwable $e) {
+    return $default;
+  }
+}
+
+function app_settings(PDO $pdo): array {
+  $defaults = [
+    'app_name' => 'ArenaX',
+    'support_email' => '',
+    'upi_id' => '',
+    'coins_per_rupee' => '10',
+    'registration_enabled' => '1',
+    'maintenance_mode' => '0',
+    'home_notice' => '',
+    'referral_coins' => '0',
+    'min_topup_rupees' => '50',
+  ];
+  try {
+    $rows = $pdo->query('SELECT setting_key, setting_value FROM app_settings')->fetchAll();
+    foreach ($rows as $row) {
+      $defaults[(string)$row['setting_key']] = (string)$row['setting_value'];
+    }
+  } catch (Throwable $e) {
+  }
+  return $defaults;
+}
+
 function current_user(PDO $pdo): ?array {
   if (empty($_SESSION['user_id'])) return null;
   $q=$pdo->prepare('SELECT id,username,email,coins,role,status FROM users WHERE id=? AND status="active"');
